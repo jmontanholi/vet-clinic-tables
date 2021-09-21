@@ -3,10 +3,11 @@
 CREATE DATABASE vet_clinic;
 
 CREATE TABLE animals(
-  id INT PRIMARY KEY, 
+  id SERIAL PRIMARY KEY, 
   name VARCHAR(30), 
   date_of_birth DATE, 
   escape_attempts INT, 
   neutered BOOL, 
-  weight_kg DEC
+  weight_kg DEC,
+  species VARCHAR(30)
 );
