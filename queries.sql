@@ -1,31 +1,50 @@
 /*Queries that provide answers to the questions from all projects.*/
+SELECT name AS animal_name, full_name AS owner 
+  FROM animals 
+    JOIN owners ON animals.owner_id = owners.id 
+      WHERE full_name = 'Melody Pond';
 
-BEGIN TRANSACTION;
-UPDATE animals SET species = 'unspecified';
-ROLLBACK;
+SELECT animals.name, species.name AS species 
+  FROM animals 
+    JOIN species ON animals.species_id = species.id 
+      WHERE species.name = 'Pokemon';
 
-BEGIN TRANSACTION;
-UPDATE animals SET species = 'digimon' WHERE name LIKE '%mon';
-UPDATE animals SET species = 'pokemon' WHERE species != 'digimon';
-COMMIT;
+SELECT full_name, name AS animal_name 
+  FROM owners 
+    LEFT JOIN animals ON owners.id = animals.owner_id;
 
-BEGIN TRANSACTION;
-DELETE FROM animals;
-ROLLBACK;
+SELECT COUNT(animals.name), species.name 
+  FROM animals 
+    JOIN species ON animals.species_id = species.id 
+      GROUP BY species.name;
 
-BEGIN TRANSACTION;
-DELETE FROM animals WHERE date_of_birth > '01-01-2022';
-SAVEPOINT savepoint1;
-UPDATE animals SET weight_kg = weight_kg*-1 WHERE weight_kg < 0;
-SELECT * FROM animals;
-ROLLBACK TO savepoint1;
-SELECT * FROM animals;
-UPDATE animals SET weight_kg = weight_kg*-1 WHERE weight_kg < 0;
-COMMIT;
+SELECT full_name AS owner, animals.name AS animal_name, species.name
+  FROM owners 
+    JOIN animals ON owners.id = animals.owner_id
+    JOIN species ON animals.species_id = species.id
+      WHERE species.name = 'Digimon' AND full_name = 'Jennifer Orwell';
 
-SELECT COUNT(*) FROM animals;
-SELECT COUNT(*) FROM animals WHERE escape_attempts = 0;
-SELECT AVG(weight_kg) FROM animals;
-SELECT neutered, COUNT(escape_attempts) FROM animals GROUP BY neutered;
-SELECT species, MIN(weight_kg), MAX(weight_kg) FROM animals GROUP BY species;
-SELECT species, AVG(escape_attempts) FROM animals WHERE date_of_birth BETWEEN '01-01-1990' AND '31-12-2000' GROUP BY species;
+SELECT full_name AS owner, animals.name AS animal_name, escape_attempts
+  FROM animals 
+    JOIN owners ON animals.owner_id = owners.id
+    WHERE full_name = 'Dean Winchester' AND escape_attempts = 0;
+
+-- Who owns the most animals??
+SELECT maxOwn.fn AS owner
+  FROM (SELECT COUNT(name) AS owned, full_name AS fn
+          FROM animals
+            JOIN owners ON animals.owner_id = owners.id
+            GROUP BY fn
+        ) AS maxOwn
+  WHERE maxOwn.owned = (SELECT MAX(maxOwn.owned) FROM (SELECT COUNT(name) AS owned, full_name AS fn
+          FROM animals
+            JOIN owners ON animals.owner_id = owners.id
+            GROUP BY fn
+        ) AS maxOwn);
+-- OR
+SELECT COUNT(name) AS owned, full_name AS fn
+          FROM animals
+            JOIN owners ON animals.owner_id = owners.id
+            GROUP BY fn
+            ORDER BY owned DESC
+            LIMIT 1;
