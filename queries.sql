@@ -92,11 +92,7 @@ SELECT v.visit_date, animals.name
     LIMIT 1;
 
 SELECT visit_date,
-       animals.name, 
-       animals.date_of_birth, 
-       animals.escape_attempts,
-       animals.neutered,
-       animals.weight_kg,
+       animals.*,
        species.name AS species,
        vets.name AS vet_name,
        vets.age,
